@@ -1,11 +1,892 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Holistic Gesture Benchmark</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="HolisticGestureBenchmark — a unified, perceptually grounded benchmark for holistic co-speech gesture generation." />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>HolisticGestureBenchmark</title>
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --bg2: #edf2f8;
+      --panel: rgba(255,255,255,.82);
+      --panel-strong: rgba(255,255,255,.98);
+      --line: rgba(31,55,90,.13);
+      --text: #172238;
+      --muted: #5f6f86;
+      --muted2: #8190a5;
+      --cyan: #13a6c8;
+      --blue: #3f6ed8;
+      --violet: #7357c8;
+      --pink: #bd5b94;
+      --green: #238b63;
+      --gold: #b7791f;
+      --shadow: 0 18px 55px rgba(36,56,86,.10);
+      --radius: 26px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 620px at 7% -8%, rgba(63,110,216,.12), transparent 62%),
+        radial-gradient(850px 560px at 92% 2%, rgba(115,87,200,.10), transparent 60%),
+        radial-gradient(820px 540px at 52% 70%, rgba(19,166,200,.075), transparent 64%),
+        linear-gradient(180deg, #f8faff 0%, #f3f6fb 46%, #edf2f8 100%);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: rgba(63,110,216,.18); color: #172238; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+    .section { padding: 92px 0; }
+    .section.compact { padding-top: 58px; padding-bottom: 58px; }
+
+    .nav-wrap {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(180deg, rgba(248,250,255,.95), rgba(248,250,255,.80));
+      border-bottom: 1px solid rgba(31,55,90,.08);
+    }
+    nav {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+      min-height: 72px;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:850; letter-spacing:-.02em; }
+    .brand-mark {
+      width:34px; height:34px; border-radius:11px; position:relative; overflow:hidden;
+      background: conic-gradient(from 210deg, var(--cyan), var(--blue), var(--violet), var(--pink), var(--cyan));
+      box-shadow: 0 0 28px rgba(63,110,216,.13);
+    }
+    .brand-mark::after { content:""; position:absolute; inset:4px; border-radius:8px; background:#f7f9fd; }
+    .nav-links { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .nav-links a { padding:8px 11px; border-radius:11px; color:var(--muted); font-size:14px; font-weight:650; transition:.2s ease; }
+    .nav-links a:hover { color:var(--text); background:rgba(63,110,216,.07); }
+
+    .hero { padding: 102px 0 74px; position:relative; }
+    .hero::before {
+      content:""; position:absolute; width:520px; height:520px; border-radius:50%;
+      left:50%; top:140px; transform:translateX(-50%);
+      background:radial-gradient(circle, rgba(63,110,216,.10), transparent 68%);
+      pointer-events:none;
+    }
+    .eyebrow {
+      width:fit-content; margin:0 auto 24px; padding:8px 12px; border-radius:999px;
+      border:1px solid rgba(63,110,216,.16); background:rgba(63,110,216,.055);
+      color:#315eb8; font-weight:800; font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+    }
+    h1 {
+      margin:0 auto; max-width:1060px; text-align:center;
+      font-size:clamp(50px,7.4vw,104px); line-height:.96; letter-spacing:-.065em; font-weight:900;
+    }
+    .grad {
+      background:linear-gradient(90deg,#15233d 0%,#2c5fbf 30%,#5e62c8 62%,#9a4f8f 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .subtitle {
+      max-width:960px; margin:30px auto 0; text-align:center; color:#60718a;
+      font-size:clamp(18px,2.15vw,24px); line-height:1.55;
+    }
+    .hero-actions { margin-top:34px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn {
+      display:inline-flex; align-items:center; gap:9px; padding:12px 18px; border-radius:14px;
+      border:1px solid var(--line); background:rgba(255,255,255,.78); color:var(--text); font-weight:750;
+      transition:.2s ease; box-shadow:0 10px 30px rgba(36,56,86,.08);
+    }
+    .btn:hover { transform:translateY(-2px); border-color:rgba(63,110,216,.24); background:rgba(255,255,255,.98); }
+    .btn.primary { border-color:rgba(63,110,216,.22); background:linear-gradient(135deg,rgba(19,166,200,.10),rgba(63,110,216,.11)); }
+    .hero-note { margin:22px auto 0; text-align:center; color:var(--muted2); font-size:13px; }
+
+    .stats { margin-top:56px; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .stat {
+      min-height:132px; padding:22px; border:1px solid var(--line); border-radius:22px;
+      background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.76));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+    }
+    .stat strong { display:block; font-size:34px; letter-spacing:-.04em; line-height:1; }
+    .stat span { display:block; margin-top:9px; color:var(--muted); font-size:14px; }
+
+    .section-kicker { margin-bottom:12px; color:var(--blue); font-size:13px; text-transform:uppercase; letter-spacing:.12em; font-weight:800; }
+    .section-title { margin:0; max-width:920px; font-size:clamp(34px,4vw,58px); line-height:1.04; letter-spacing:-.045em; }
+    .section-lead { max-width:900px; margin:18px 0 0; color:var(--muted); font-size:18px; }
+
+    .statement {
+      position:relative; overflow:hidden; border:1px solid rgba(115,87,200,.16); border-radius:32px;
+      padding:40px; margin-top:34px;
+      background:radial-gradient(540px 240px at 85% 10%,rgba(115,87,200,.10),transparent 70%),
+                 linear-gradient(135deg,rgba(63,110,216,.055),rgba(255,255,255,.86));
+      box-shadow:var(--shadow);
+    }
+    .statement blockquote { margin:0; max-width:980px; font-size:clamp(24px,3.2vw,43px); line-height:1.22; letter-spacing:-.035em; font-weight:780; }
+    .statement p { margin:18px 0 0; color:var(--muted); max-width:900px; }
+
+    .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:34px; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:34px; }
+    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:34px; }
+
+    .card {
+      border:1px solid var(--line); border-radius:var(--radius); padding:28px;
+      background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.74));
+      box-shadow:var(--shadow);
+    }
+    .card h3 { margin:0 0 10px; font-size:21px; letter-spacing:-.02em; }
+    .card p { margin:0; color:var(--muted); }
+    .card .index {
+      width:42px; height:42px; border-radius:13px; display:grid; place-items:center; margin-bottom:22px;
+      font-weight:850; color:#24436f; border:1px solid rgba(63,110,216,.15); background:rgba(63,110,216,.07);
+    }
+    .chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+    .chip { display:inline-flex; padding:6px 10px; border-radius:999px; border:1px solid rgba(31,55,90,.10); background:rgba(255,255,255,.74); color:#566981; font-size:12px; font-weight:700; }
+
+    .detail-card {
+      border:1px solid var(--line); border-radius:22px; padding:24px;
+      background:rgba(255,255,255,.78);
+    }
+    .detail-card h4 { margin:0 0 10px; font-size:17px; }
+    .detail-card p { margin:0; color:var(--muted); font-size:14px; }
+
+    .protocol { display:grid; grid-template-columns:1.15fr .85fr; gap:18px; margin-top:34px; }
+    .flow { border:1px solid var(--line); border-radius:var(--radius); padding:28px; background:rgba(255,255,255,.74); box-shadow:var(--shadow); }
+    .flow-row { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; gap:12px; margin-top:20px; }
+    .flow-box {
+      min-height:115px; display:flex; flex-direction:column; justify-content:center; padding:18px; border-radius:18px;
+      border:1px solid rgba(31,55,90,.10); background:rgba(255,255,255,.88);
+    }
+    .flow-box b { font-size:17px; }
+    .flow-box span { color:var(--muted2); font-size:13px; margin-top:6px; }
+    .arrow { color:var(--muted2); font-size:22px; }
+    .model-list { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+    .model { padding:14px; border-radius:16px; border:1px solid rgba(31,55,90,.09); background:rgba(255,255,255,.82); }
+    .model b { display:block; }
+    .model span { display:block; margin-top:3px; color:var(--muted2); font-size:12px; }
+
+    .metric-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:34px; }
+    .metric-family { border:1px solid var(--line); border-radius:22px; padding:20px; background:rgba(255,255,255,.74); box-shadow:var(--shadow); }
+    .metric-family h4 { margin:0 0 12px; font-size:15px; }
+    .metric-family ul { margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+    .metric-family li { color:var(--muted); font-size:13px; }
+    .metric-family em { color:#24436f; font-style:normal; font-weight:750; }
+
+    .study { margin-top:34px; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .study-panel { border:1px solid var(--line); border-radius:var(--radius); padding:28px; background:rgba(255,255,255,.78); box-shadow:var(--shadow); }
+    .study-panel h3 { margin:0 0 18px; }
+    .dimension { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-top:1px solid rgba(31,55,90,.08); color:#31445f; }
+    .dimension:first-of-type { border-top:0; }
+    .dimension small { color:var(--muted2); }
+    .study-callout { margin-top:16px; padding:18px; border-radius:16px; background:rgba(63,110,216,.055); border:1px solid rgba(63,110,216,.13); color:#50667f; }
+
+    .sgp-layout { display:grid; grid-template-columns:.9fr 1.1fr; gap:18px; margin-top:34px; }
+    .sgp-box {
+      border:1px solid rgba(19,166,200,.16); border-radius:var(--radius); padding:28px;
+      background:linear-gradient(180deg,rgba(19,166,200,.055),rgba(255,255,255,.82)); box-shadow:var(--shadow);
+    }
+    .formula {
+      font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+      font-size:clamp(18px,2vw,25px); padding:18px; margin:18px 0 0; border-radius:16px;
+      background:#eef3f9; border:1px solid rgba(31,55,90,.08); color:#285e88; overflow:auto;
+    }
+    .annotation { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:18px; }
+    .annotation div { padding:13px 10px; border-radius:14px; text-align:center; background:rgba(255,255,255,.82); border:1px solid rgba(31,55,90,.08); color:#40536d; font-size:12px; font-weight:700; }
+
+    .findings { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:34px; }
+    .finding {
+      position:relative; padding:24px 24px 24px 70px; border-radius:22px; border:1px solid var(--line); background:rgba(255,255,255,.74); box-shadow:var(--shadow);
+    }
+    .finding::before {
+      content:attr(data-n); position:absolute; left:22px; top:23px; width:32px; height:32px; border-radius:10px;
+      display:grid; place-items:center; background:rgba(115,87,200,.10); border:1px solid rgba(115,87,200,.18);
+      color:#6b55b5; font-size:12px; font-weight:900;
+    }
+    .finding b { display:block; margin-bottom:7px; }
+    .finding p { margin:0; color:var(--muted); font-size:14px; }
+
+    .table-wrap { margin-top:34px; overflow:auto; border:1px solid var(--line); border-radius:24px; background:rgba(255,255,255,.70); box-shadow:var(--shadow); }
+    table { border-collapse:collapse; width:100%; min-width:1110px; font-size:12px; }
+    th, td { padding:12px 10px; text-align:right; border-bottom:1px solid rgba(31,55,90,.08); white-space:nowrap; }
+    th:first-child, td:first-child { text-align:left; position:sticky; left:0; background:#eef3f9; z-index:1; }
+    thead th { color:#31445f; background:#eef3f9; font-weight:800; }
+    tbody td { color:#60718a; }
+    tbody tr:hover td { background:rgba(63,110,216,.03); }
+    tbody tr:hover td:first-child { background:#e7edf6; }
+    .best { color:var(--green); font-weight:900; }
+    .close0 { color:var(--gold); font-weight:850; }
+
+    .corr-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:34px; }
+    .corr-card { border:1px solid var(--line); border-radius:20px; padding:18px; background:rgba(255,255,255,.70); box-shadow:var(--shadow); }
+    .corr-card h4 { margin:0 0 14px; min-height:44px; }
+    .corr-row { margin:10px 0; }
+    .corr-head { display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .bar { height:8px; border-radius:999px; background:rgba(31,55,90,.08); overflow:hidden; }
+    .fill { height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet)); }
+
+    .timeline { margin-top:34px; display:grid; gap:12px; }
+    .timeline-item { display:grid; grid-template-columns:170px 1fr; gap:18px; padding:20px 22px; border:1px solid var(--line); border-radius:20px; background:rgba(255,255,255,.76); }
+    .timeline-item b { color:#315eb8; }
+    .timeline-item p { margin:0; color:var(--muted); }
+
+    .note { margin-top:26px; color:var(--muted2); font-size:13px; }
+
+    footer { padding:42px 0 54px; color:var(--muted2); font-size:13px; text-align:center; border-top:1px solid rgba(31,55,90,.08); }
+
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .65s ease,transform .65s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    @media (max-width: 980px) {
+      .stats { grid-template-columns:1fr 1fr; }
+      .grid-4 { grid-template-columns:1fr 1fr; }
+      .grid-3 { grid-template-columns:1fr; }
+      .protocol,.sgp-layout { grid-template-columns:1fr; }
+      .metric-grid { grid-template-columns:1fr 1fr; }
+      .corr-grid { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width: 720px) {
+      nav { min-height:64px; }
+      .nav-links a:nth-child(n+4) { display:none; }
+      .hero { padding-top:70px; }
+      .stats,.grid-2,.grid-4,.study,.findings,.corr-grid { grid-template-columns:1fr; }
+      .metric-grid { grid-template-columns:1fr; }
+      .flow-row { grid-template-columns:1fr; }
+      .arrow { transform:rotate(90deg); text-align:center; }
+      .annotation { grid-template-columns:1fr 1fr; }
+      .timeline-item { grid-template-columns:1fr; gap:6px; }
+      .section { padding:70px 0; }
+    }
+  </style>
 </head>
+
 <body>
-    <h1>Holistic Gesture Benchmark</h1>
-    <p>Project page coming soon.</p>
+  <div class="nav-wrap">
+    <nav>
+      <a class="brand" href="#top">
+        <span class="brand-mark"></span>
+        <span>HolisticGestureBenchmark</span>
+      </a>
+      <div class="nav-links">
+        <a href="#motivation">Motivation</a>
+        <a href="#benchmark">Benchmark</a>
+        <a href="#metrics">Metrics</a>
+        <a href="#study">Human Study</a>
+        <a href="#sgp">SGP</a>
+        <a href="#results">Results</a>
+      </div>
+    </nav>
+  </div>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="eyebrow">Holistic Co-Speech Gesture Evaluation</div>
+        <h1><span class="grad">HolisticGestureBenchmark</span></h1>
+        <p class="subtitle">
+          A unified evaluation framework for holistic co-speech gesture generation that combines
+          standardized benchmarking, perceptual validation of objective metrics, and fine-grained semantic analysis.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="paper.pdf" target="_blank">📄 Paper</a>
+          <a class="btn" href="#results">↳ Explore Results</a>
+        </div>
+        <div class="hero-note">EUROGRAPHICS 2027 · Project webpage</div>
+
+        <div class="stats reveal">
+          <div class="stat"><strong>4</strong><span>representative holistic gesture generation systems evaluated under one protocol</span></div>
+          <div class="stat"><strong>15</strong><span>objective metrics reported in the benchmark table, spanning distribution, geometry, motion quality, alignment and semantics</span></div>
+          <div class="stat"><strong>101</strong><span>valid participants after quality control across muted and audio studies</span></div>
+          <div class="stat"><strong>265</strong><span>shared BEAT2 test sequences used for objective evaluation, except SGP</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section compact" id="motivation">
+      <div class="container">
+        <div class="statement reveal">
+          <div class="section-kicker">Why this benchmark?</div>
+          <blockquote>
+            Holistic gesture quality is not one thing:
+            <span class="grad">naturalness, diversity, synchrony, physical plausibility, and semantic appropriateness can move in different directions.</span>
+          </blockquote>
+          <p>
+            Recent holistic systems synthesize coordinated face, hand, upper-body, lower-body, and global motion, often conditioned on both speech acoustics and linguistic content.
+            Yet evaluation has not kept pace. Different works use different datasets, preprocessing, rendering pipelines, metrics, and subjective protocols, making reported gains hard to compare directly.
+            Even when models are evaluated under the same protocol, commonly used objective metrics may still fail to reflect human perception, particularly for semantic gestures that are sparse,
+            context-dependent, and can be expressed through many valid physical forms.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <article class="card reveal">
+            <div class="index">01</div>
+            <h3>Heterogeneous protocols</h3>
+            <p>
+              Prior systems are often evaluated with incompatible training regimes, data subsets, sequence boundaries, renderers, and metric implementations.
+              Apparent model improvements may therefore reflect experimental choices rather than algorithmic progress.
+            </p>
+          </article>
+          <article class="card reveal">
+            <div class="index">02</div>
+            <h3>Metrics vs. people</h3>
+            <p>
+              Objective measures are reproducible and scalable, but strong correspondence with human judgments is not guaranteed.
+              Our benchmark explicitly asks which metrics align with which perceptual properties instead of assuming that all scores are equally meaningful.
+            </p>
+          </article>
+          <article class="card reveal">
+            <div class="index">03</div>
+            <h3>The semantic gap</h3>
+            <p>
+              A gesture can be smooth, plausible, and synchronized while still being semantically empty or mismatched.
+              Reference-pose metrics also penalize alternative gestures that may communicate the same meaning through different motion.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="benchmark">
+      <div class="container">
+        <div class="section-kicker">01 · Benchmark framework</div>
+        <h2 class="section-title">Standardized training, inference, rendering, and evaluation.</h2>
+        <p class="section-lead">
+          The benchmark compares EMAGE, GestureLSM, SemTalk, and SemConFlow under a shared BEAT2 evaluation setting.
+          The goal is not only to rank systems, but to make those rankings interpretable by controlling the sources of experimental variation.
+        </p>
+
+        <div class="protocol">
+          <div class="flow reveal">
+            <h3 style="margin:0">Unified benchmark protocol</h3>
+            <div class="flow-row">
+              <div class="flow-box"><b>Common training regime</b><span>official implementations and optimization settings, trained with shared BEAT2 data</span></div>
+              <div class="arrow">→</div>
+              <div class="flow-box"><b>Common inference</b><span>same test sequences, speech inputs, and sequence boundaries</span></div>
+              <div class="arrow">→</div>
+              <div class="flow-box"><b>Common evaluation</b><span>SMPL-X conversion, post-processing, rendering, metrics, and perception study</span></div>
+            </div>
+          </div>
+
+          <div class="flow reveal">
+            <h3 style="margin:0">Dataset & implementation</h3>
+            <div class="timeline">
+              <div class="timeline-item" style="grid-template-columns:110px 1fr"><b>BEAT2</b><p>≈60 hours, 25 speakers, synchronized speech and holistic SMPL-X motion.</p></div>
+              <div class="timeline-item" style="grid-template-columns:110px 1fr"><b>Split</b><p>Official 85% / 7.5% / 7.5% train / validation / test split across all 25 speakers.</p></div>
+              <div class="timeline-item" style="grid-template-columns:110px 1fr"><b>Compute</b><p>All benchmark experiments are conducted on a single NVIDIA A100 GPU.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="card reveal">
+            <h3>EMAGE</h3>
+            <p>
+              A unified holistic framework that jointly synthesizes facial expressions, upper- and lower-body motion, hands, and global translation.
+              It uses a Masked Audio Gesture Transformer and four compositional VQ-VAEs for different body regions.
+              Content Rhythm Attention adaptively combines speech rhythm and transcript semantics.
+            </p>
+            <div class="chip-row"><span class="chip">Masked modeling</span><span class="chip">Compositional VQ-VAEs</span><span class="chip">CRA</span></div>
+          </div>
+
+          <div class="card reveal">
+            <h3>GestureLSM</h3>
+            <p>
+              A flow-matching framework for real-time holistic gesture generation.
+              Region-specific residual vector-quantized tokens are coordinated through spatial and temporal attention,
+              while a latent shortcut model reduces the number of sampling steps.
+            </p>
+            <div class="chip-row"><span class="chip">Flow matching</span><span class="chip">Spatial-temporal attention</span><span class="chip">Latent shortcut</span></div>
+          </div>
+
+          <div class="card reveal">
+            <h3>SemTalk</h3>
+            <p>
+              Separates rhythm-related base motion from sparse semantic motion.
+              A hierarchical coarse-to-fine module establishes rhythmic consistency, while semantic emphasis learning activates content-related motion at key frames using text, CLIP, emotion, and speech features.
+            </p>
+            <div class="chip-row"><span class="chip">Rhythm base</span><span class="chip">Sparse semantics</span><span class="chip">Frame-level emphasis</span></div>
+          </div>
+
+          <div class="card reveal">
+            <h3>SemConFlow</h3>
+            <p>
+              Learns region-specific RVQ-VAE motion priors and aligns the resulting holistic motion latent with text and audio.
+              Contrastive flow matching uses mismatched audio-text contexts as negatives, encouraging semantically congruent trajectories and discouraging generic rhythm-dominated gestures.
+            </p>
+            <div class="chip-row"><span class="chip">RVQ-VAE</span><span class="chip">Semantic alignment</span><span class="chip">Contrastive flow matching</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="metrics">
+      <div class="container">
+        <div class="section-kicker">02 · Objective evaluation</div>
+        <h2 class="section-title">A multidimensional taxonomy of gesture quality.</h2>
+        <p class="section-lead">
+          The benchmark organizes objective evaluation by what each metric is intended to capture.
+          This distinction is important because several metrics that look similar numerically measure fundamentally different properties.
+        </p>
+
+        <div class="metric-grid">
+          <div class="metric-family reveal">
+            <h4>Distributional similarity</h4>
+            <ul>
+              <li><em>FGD</em> compares reference and generated distributions in a learned gesture feature space.</li>
+              <li><em>Density</em> measures whether generated samples lie in well-supported regions of the real-data manifold.</li>
+              <li><em>Coverage</em> measures how extensively generated samples cover the support of the reference distribution.</li>
+              <li><em>Diversity</em> captures motion variability.</li>
+            </ul>
+          </div>
+
+          <div class="metric-family reveal">
+            <h4>Geometric fidelity</h4>
+            <ul>
+              <li><em>Chamfer</em> compares root-aligned SMPL-X vertex clouds through average nearest-neighbor distance.</li>
+              <li><em>Hausdorff</em> focuses on the largest unmatched surface discrepancy.</li>
+              <li><em>MJD</em> measures root-aligned mean joint distance for body and hands.</li>
+              <li><em>Dice</em> measures overlap between projected motion occupancy maps.</li>
+              <li><em>PCK</em> evaluates joint correctness under a distance threshold.</li>
+            </ul>
+          </div>
+
+          <div class="metric-family reveal">
+            <h4>Motion quality</h4>
+            <ul>
+              <li><em>LDLJ<sub>REL</sub></em> compares normalized movement smoothness; values close to zero indicate smoothness similar to the reference.</li>
+              <li><em>Foot Contact</em> compares stable ground-contact rates and targets lower-body plausibility and sliding artifacts.</li>
+            </ul>
+          </div>
+
+          <div class="metric-family reveal">
+            <h4>Speech-motion alignment</h4>
+            <ul>
+              <li><em>Beat Consistency (BC)</em> measures temporal correspondence between detected motion beats and acoustic beats.</li>
+              <li>BC is prosody-aware but semantics-agnostic: it measures when gestures occur, not whether they communicate the spoken meaning.</li>
+            </ul>
+          </div>
+
+          <div class="metric-family reveal">
+            <h4>Semantic appropriateness</h4>
+            <ul>
+              <li><em>SRGR</em> upweights pose correctness at semantically relevant frames.</li>
+              <li><em>Semantic Score (SC)</em> compares speech and motion embeddings with cosine similarity.</li>
+              <li><em>SGP</em> measures whether semantic gesture intervals avoid collapsing into generic beat-like motion.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="detail-card reveal">
+            <h4>Why reference-pose metrics are limited</h4>
+            <p>
+              Co-speech gesture realization is one-to-many. The same communicative intent may be expressed with a different hand path, orientation, scale, or even a different valid gesture.
+              Exact geometric agreement can therefore underestimate perceptually appropriate motion.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Why distribution metrics matter</h4>
+            <p>
+              FGD, Density, and Coverage characterize whether generated motion occupies plausible regions of motion space.
+              In our results, these distributional measures are often more predictive of human ratings than direct pose-space distances.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Why semantic metrics need interpretation</h4>
+            <p>
+              SRGR and SC provide useful semantic signals, but neither directly resolves the many-to-many relation between meaning and motion.
+              SGP is designed as a complementary event-level measure rather than a replacement for all other metrics.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="study">
+      <div class="container">
+        <div class="section-kicker">03 · Perceptual validation</div>
+        <h2 class="section-title">Human evaluation is split into visual and speech-aware conditions.</h2>
+        <p class="section-lead">
+          Participants complete only one condition, so motion-centric judgments can be separated from judgments that require listening to speech.
+          All criteria use a seven-point scale, with higher ratings indicating better perceived quality.
+        </p>
+
+        <div class="study">
+          <div class="study-panel reveal">
+            <h3>🔇 Muted condition <span style="color:var(--muted2);font-size:14px;font-weight:600">· 49 valid participants</span></h3>
+            <div class="dimension"><span>Human-likeness</span><small>Could a real person perform this motion?</small></div>
+            <div class="dimension"><span>Motion diversity</span><small>Does the animation contain varied rather than repetitive movement?</small></div>
+            <div class="dimension"><span>Absence of animation errors</span><small>Is the motion free from jumps, freezing, interpenetration, or strange behavior?</small></div>
+          </div>
+
+          <div class="study-panel reveal">
+            <h3>🔊 Audio condition <span style="color:var(--muted2);font-size:14px;font-weight:600">· 52 valid participants</span></h3>
+            <div class="dimension"><span>Speech timing</span><small>Do gestures occur at appropriate moments relative to rhythm, pauses, and emphasis?</small></div>
+            <div class="dimension"><span>Content match</span><small>Do gestures meaningfully correspond to the spoken content?</small></div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="detail-card reveal">
+            <h4>Stimulus construction</h4>
+            <p>
+              The study compares the four generated systems with BEAT2 motion-capture ground truth. All conditions use the same avatar, camera, crop, renderer, and 10-second temporal window.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Semantic enrichment</h4>
+            <p>
+              Windows are selected to contain many iconic, metaphoric, and deictic gestures. The selected stimuli contain 80 annotated semantic events: 44 iconic, 18 metaphoric, and 18 deictic.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Quality control</h4>
+            <p>
+              Each study includes practice trials and 16 attention checks. Videos must be watched in full before ratings are submitted. Participants failing two or more checks are excluded.
+            </p>
+          </div>
+        </div>
+
+        <div class="study-callout reveal">
+          <b>103 participants were recruited; 101 remained after quality control.</b>
+          Two participants were excluded from the muted study, leaving 49 muted and 52 audio participants.
+          Repeated sequence observations were pooled before aggregation, producing 75 model-sequence observations across all five motion sources
+          and 60 generated-motion observations after excluding ground truth.
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sgp">
+      <div class="container">
+        <div class="section-kicker">04 · Semantics-aware evaluation</div>
+        <h2 class="section-title">Fine-grained semantic annotation with Gemini 2.5 Pro.</h2>
+        <p class="section-lead">
+          Existing BEAT annotations specify semantic intervals and coarse categories, but do not fully describe how a gesture is physically realized or what it means in context.
+          We enrich those annotations instead of replacing them.
+        </p>
+
+        <div class="sgp-layout">
+          <div class="sgp-box reveal">
+            <h3 style="margin:0">Event-level annotation</h3>
+            <p style="color:var(--muted)">
+              For each semantic event, the rendered motion segment and target word are provided to Gemini 2.5 Pro.
+              The model is instructed to analyze only the specified interval and ground its output in visible motion rather than assuming a semantic gesture is present.
+            </p>
+            <div class="annotation">
+              <div>Handedness</div><div>Hand shape</div><div>Orientation</div><div>Location</div><div>Movement</div>
+            </div>
+            <div class="chip-row">
+              <span class="chip">Gesture description</span>
+              <span class="chip">Contextual meaning</span>
+              <span class="chip">Gesture type</span>
+              <span class="chip">Confidence</span>
+            </div>
+          </div>
+
+          <div class="sgp-box reveal">
+            <h3 style="margin:0">Semantic Gesture Preservation (SGP)</h3>
+            <p style="color:var(--muted)">
+              SGP focuses on whether a semantic interval is preserved as a non-generic gesture rather than collapsing into a beat.
+              For each event, Gemini classifies the observed gesture as iconic, metaphoric, deictic, beat, none, or uncertain.
+            </p>
+            <div class="formula">SGP = 1 − (# semantic events classified as beat / # valid semantic events)</div>
+            <p style="margin-bottom:0;color:var(--muted2);font-size:13px">
+              SGP = 1 means none of the evaluated semantic events are classified as beats. The score is averaged at the clip level, so each clip contributes equally regardless of event count.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="detail-card reveal">
+            <h4>Manual validation</h4>
+            <p>
+              A subset of Gemini outputs is manually checked. Gesture-type agreement is compared with existing labels,
+              contextual meaning is judged as correct or incorrect, and gesture-description quality is assessed across the five visual properties.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Interpretation boundary</h4>
+            <p>
+              SGP is not semantic ground truth and does not verify exact meaning preservation or exact gesture category.
+              It is specifically a measure of semantic-gesture preservation against beat-gesture collapse, designed to relax strict one-to-one pose matching.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="results">
+      <div class="container">
+        <div class="section-kicker">05 · Objective benchmark</div>
+        <h2 class="section-title">No model dominates every metric family.</h2>
+        <p class="section-lead">
+          The benchmark results show that distributional similarity, geometry, timing, physical plausibility, and semantic preservation do not improve together automatically.
+          This is exactly why a complementary metric suite is needed.
+        </p>
+
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th><th>FGD ↓</th><th>BC ↑</th><th>Div. ↑</th><th>Dens. ↑</th><th>Cov. ↑</th><th>Dice ↑</th>
+                <th>LDLJ<sub>REL</sub> →0</th><th>SRGR ↑</th><th>PCK ↑</th><th>MJD ↓</th><th>Chamfer ↓</th><th>Hausdorff ↓</th>
+                <th>Foot Contact ↓</th><th>SC ↑</th><th>SGP ↑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>EMAGE</b></td><td>5.523</td><td>0.692</td><td>88</td><td class="best">0.8972</td><td class="best">0.07275</td><td>0.6407</td>
+                <td class="close0">0.0530</td><td>0.05494</td><td>0.3309</td><td>0.2410</td><td>0.01375</td><td>0.2908</td><td>0.5048</td><td>0.248</td><td class="best">0.4372</td>
+              </tr>
+              <tr>
+                <td><b>SemConFlow</b></td><td class="best">2.245</td><td class="best">0.780</td><td class="best">120</td><td>0.01559</td><td>0.06647</td><td class="best">0.6793</td>
+                <td>-0.4294</td><td class="best">0.05868</td><td class="best">0.3552</td><td class="best">0.2007</td><td class="best">0.01112</td><td class="best">0.2530</td><td>0.5932</td><td class="best">0.314</td><td>0.4205</td>
+              </tr>
+              <tr>
+                <td><b>SemTalk</b></td><td>4.266</td><td>0.727</td><td>116</td><td>0.1123</td><td>0.06673</td><td>0.6241</td>
+                <td>-0.6020</td><td>0.05059</td><td>0.3037</td><td>0.2303</td><td>0.13976</td><td>0.4663</td><td class="best">0.4040</td><td>0.268</td><td>0.4014</td>
+              </tr>
+              <tr>
+                <td><b>GestureLSM</b></td><td>4.268</td><td>0.525</td><td>112</td><td>0.009239</td><td>0.009817</td><td>0.6573</td>
+                <td>1.5386</td><td>0.04536</td><td>0.2715</td><td>0.2391</td><td>0.01797</td><td>0.2909</td><td>0.8883</td><td>0.248</td><td>0.2622</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid-3">
+          <div class="detail-card reveal">
+            <h4>SemConFlow</h4>
+            <p>
+              Achieves the strongest overall performance on most motion- and alignment-related metrics, including FGD, BC, Diversity, Dice, SRGR, PCK, MJD, Chamfer, and Hausdorff.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>EMAGE</h4>
+            <p>
+              Obtains the best Density and Coverage, has LDLJ<sub>REL</sub> closest to zero, and achieves the highest SGP score, indicating fewer semantic intervals collapse into generic beats.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>SemTalk & GestureLSM</h4>
+            <p>
+              SemTalk achieves the best Foot Contact result, while GestureLSM remains competitive on diversity and geometric fidelity but does not lead an individual metric in the benchmark table.
+            </p>
+          </div>
+        </div>
+
+        <p class="note">
+          Objective metrics are computed over 265 shared test sequences, except SGP, which is evaluated on the 15 perceptual-study sequences with Gemini-based semantic annotations.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-kicker">06 · Subjective results</div>
+        <h2 class="section-title">Ground truth remains clearly ahead — especially on perceptual quality and speech appropriateness.</h2>
+        <p class="section-lead">
+          BEAT2 reference motion receives the highest average rating on all five human-study dimensions.
+          The gap is smaller for motion diversity, suggesting that current systems can approach reference-level variability more easily than they reproduce naturalness and speech-conditioned appropriateness.
+        </p>
+
+        <div class="findings">
+          <div class="finding reveal" data-n="01">
+            <b>SemConFlow leads the generated systems.</b>
+            <p>Among generated methods, SemConFlow achieves the highest mean subjective score on all five perceptual dimensions.</p>
+          </div>
+          <div class="finding reveal" data-n="02">
+            <b>Muted and audio rankings differ.</b>
+            <p>In the muted study, SemTalk generally ranks second. In the audio study, EMAGE ranks second for speech timing and content match.</p>
+          </div>
+          <div class="finding reveal" data-n="03">
+            <b>Visual quality is not speech appropriateness.</b>
+            <p>A model that looks comparatively good without audio does not necessarily keep the same advantage when timing and semantic correspondence are judged.</p>
+          </div>
+          <div class="finding reveal" data-n="04">
+            <b>GestureLSM receives the lowest subjective means.</b>
+            <p>GestureLSM consistently receives the lowest mean ratings among the generated systems in the reported perceptual results.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-kicker">07 · Objective–subjective correlation</div>
+        <h2 class="section-title">Which automatic metrics actually track human perception?</h2>
+        <p class="section-lead">
+          The answer depends strongly on the perceptual target. No individual metric consistently explains all five human judgments.
+        </p>
+
+        <div class="corr-grid">
+          <div class="corr-card reveal">
+            <h4>Human-likeness</h4>
+            <div class="corr-row"><div class="corr-head"><span>|LDLJ<sub>REL</sub>|</span><b>.615</b></div><div class="bar"><div class="fill" style="width:61.5%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.55</b></div><div class="bar"><div class="fill" style="width:55%"></div></div></div>
+          </div>
+          <div class="corr-card reveal">
+            <h4>Motion diversity</h4>
+            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.52</b></div><div class="bar"><div class="fill" style="width:52%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>Density</span><b>.50</b></div><div class="bar"><div class="fill" style="width:50%"></div></div></div>
+          </div>
+          <div class="corr-card reveal">
+            <h4>Absence of animation errors</h4>
+            <div class="corr-row"><div class="corr-head"><span>|LDLJ<sub>REL</sub>|</span><b>.623</b></div><div class="bar"><div class="fill" style="width:62.3%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.54</b></div><div class="bar"><div class="fill" style="width:54%"></div></div></div>
+          </div>
+          <div class="corr-card reveal">
+            <h4>Speech timing</h4>
+            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.727</b></div><div class="bar"><div class="fill" style="width:72.7%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>Density</span><b>.68</b></div><div class="bar"><div class="fill" style="width:68%"></div></div></div>
+          </div>
+          <div class="corr-card reveal">
+            <h4>Content match</h4>
+            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.701</b></div><div class="bar"><div class="fill" style="width:70.1%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>Density</span><b>.66</b></div><div class="bar"><div class="fill" style="width:66%"></div></div></div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="detail-card reveal">
+            <h4>Muted judgments</h4>
+            <p>
+              LDLJ<sub>REL</sub> is the strongest correlate for both human-likeness (ρ = −0.615) and absence of animation errors (ρ = −0.623).
+              Coverage and Density are most informative for motion diversity.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Speech-aware judgments</h4>
+            <p>
+              Coverage reaches ρ = 0.727 for speech timing and ρ = 0.701 for content match.
+              Density follows closely, while FGD also shows strong negative correlations with both audio targets.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Geometry is comparatively weak</h4>
+            <p>
+              MJD and Hausdorff show little correspondence with subjective dimensions, reinforcing that perceptually appropriate gestures need not reproduce the exact reference geometry.
+            </p>
+          </div>
+        </div>
+
+        <div class="findings">
+          <div class="finding reveal" data-n="A">
+            <b>Beat Consistency behaves counter-intuitively.</b>
+            <p>BC is negatively correlated with all five perceptual dimensions, indicating that stronger beat alignment alone does not guarantee more natural or communicatively appropriate gestures.</p>
+          </div>
+          <div class="finding reveal" data-n="B">
+            <b>SGP is selectively speech-aware.</b>
+            <p>SGP correlates more strongly with speech timing (ρ = 0.419) and content match (ρ = 0.412) than with muted visual dimensions, supporting its intended role as a complementary semantic signal.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-kicker">08 · Composite metrics</div>
+        <h2 class="section-title">Can combinations of metrics predict perception better than single metrics?</h2>
+        <p class="section-lead">
+          For each perceptual target, a separate linear regressor combines 12 objective metrics.
+          Models are evaluated with leave-one-out cross-validation over the 60 generated model-sequence observations, with feature standardization performed inside each fold.
+        </p>
+
+        <div class="grid-3">
+          <div class="detail-card reveal">
+            <h4>Target-specific fitting</h4>
+            <p>
+              Separate regressors are trained for human-likeness, motion diversity, absence of animation errors, speech timing, and content match.
+              This avoids assuming that the same metric mixture should explain every perceptual dimension.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Evaluation</h4>
+            <p>
+              Held-out predictions are compared with human ratings using Spearman correlation, mean squared error, and mean absolute error.
+            </p>
+          </div>
+          <div class="detail-card reveal">
+            <h4>Interpretation</h4>
+            <p>
+              The broader conclusion is that complementary signals can improve perceptual prediction, especially for speech-aware dimensions,
+              but their utility remains target-dependent rather than universal.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-kicker">09 · Limitations</div>
+        <h2 class="section-title">What this benchmark does — and does not — establish.</h2>
+        <div class="timeline">
+          <div class="timeline-item reveal">
+            <b>Perceptual sample size</b>
+            <p>The human correlation analysis is based on 15 unique speech sequences across four generated systems, yielding 60 generated model-sequence observations rather than 60 fully independent utterances.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <b>Semantic enrichment</b>
+            <p>The selected windows deliberately contain many semantic gestures. This improves sensitivity to semantic differences but may overrepresent semantically dense speech relative to the broader BEAT2 distribution.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <b>Online study conditions</b>
+            <p>Listening environment, distraction, fatigue, and presentation-order effects cannot be fully controlled in an online perceptual study.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <b>Gemini annotations</b>
+            <p>Gemini 2.5 Pro provides scalable enrichment, but its outputs should not be treated as semantic ground truth.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <b>SGP scope</b>
+            <p>SGP measures preservation against beat-gesture collapse; it does not directly verify that the exact intended meaning or semantic gesture category is preserved.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <b>Generalization</b>
+            <p>The observed objective–subjective relationships are specific to the evaluated models, sequences, and metric implementations. Future work should extend the benchmark to broader datasets, models, and human studies.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section compact">
+      <div class="container">
+        <div class="statement reveal">
+          <div class="section-kicker">Takeaway</div>
+          <blockquote>
+            Reliable progress in holistic co-speech gesture generation requires
+            <span class="grad">multiple perceptually validated metrics, not a single aggregate score.</span>
+          </blockquote>
+          <p>
+            Distributional similarity, geometric fidelity, temporal alignment, physical plausibility, and semantic preservation each capture a different slice of gesture quality.
+            The benchmark therefore treats evaluation as a multidimensional problem: standardize the protocol, validate metrics against human perception,
+            and use semantics-aware measures as complementary evidence rather than universal substitutes.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">HolisticGestureBenchmark · Project website</div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
 </body>
 </html>
