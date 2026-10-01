@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="HolisticGestureBenchmark — a unified, perceptually grounded benchmark for holistic co-speech gesture generation." />
+  <meta name="description" content="Perceptually grounded and semantics-aware evaluation for holistic co-speech gesture generation." />
   <meta name="theme-color" content="#f5f7fb" />
-  <title>HolisticGestureBenchmark</title>
+  <title>Perceptually Grounded and Semantics-Aware Evaluation for Holistic Co-Speech Gesture Generation</title>
 
   <style>
     :root {
@@ -287,8 +287,8 @@
         <div class="eyebrow">Holistic Co-Speech Gesture Evaluation</div>
         <h1><span class="grad">HolisticGestureBenchmark</span></h1>
         <p class="subtitle">
-          A unified evaluation framework for holistic co-speech gesture generation that combines
-          standardized benchmarking, perceptual validation of objective metrics, and fine-grained semantic analysis.
+          A perceptually grounded and semantics-aware benchmark for holistic co-speech gesture generation that combines
+          standardized model comparison, human-centered metric validation, and fine-grained semantic evaluation.
         </p>
 
         <div class="hero-actions">
@@ -299,7 +299,7 @@
 
         <div class="stats reveal">
           <div class="stat"><strong>4</strong><span>representative holistic gesture generation systems evaluated under one protocol</span></div>
-          <div class="stat"><strong>15</strong><span>objective metrics reported in the benchmark table, spanning distribution, geometry, motion quality, alignment and semantics</span></div>
+          <div class="stat"><strong>13</strong><span>objective metrics curated for perceptual correlation and composite analysis across distribution, geometry, motion quality, alignment, and semantics</span></div>
           <div class="stat"><strong>101</strong><span>valid participants after quality control across muted and audio studies</span></div>
           <div class="stat"><strong>265</strong><span>shared BEAT2 test sequences used for objective evaluation, except SGP</span></div>
         </div>
@@ -605,8 +605,7 @@
           <div class="detail-card reveal">
             <h4>Manual validation</h4>
             <p>
-              A subset of Gemini outputs is manually checked. Gesture-type agreement is compared with existing labels,
-              contextual meaning is judged as correct or incorrect, and gesture-description quality is assessed across the five visual properties.
+              A randomly sampled subset of Gemini outputs is manually checked against the rendered motion. An annotation is counted as correct when its visible gesture description captures the principal motion and its semantic interpretation is compatible with the manually assessed communicative function. Under this criterion, <b>75%</b> of the evaluated LLM-generated annotations are judged correct.
             </p>
           </div>
           <div class="detail-card reveal">
@@ -663,7 +662,7 @@
           <div class="detail-card reveal">
             <h4>SemConFlow</h4>
             <p>
-              Achieves the strongest overall performance on most motion- and alignment-related metrics, including FGD, BC, Diversity, Dice, SRGR, PCK, MJD, Chamfer, and Hausdorff.
+              Achieves the strongest performance on most distributional, geometric, and speech-alignment metrics, including FGD, BC, Diversity, Dice, SRGR, PCK, MJD, Chamfer, Hausdorff, and SC.
             </p>
           </div>
           <div class="detail-card reveal">
@@ -721,13 +720,13 @@
         <div class="section-kicker">07 · Objective–subjective correlation</div>
         <h2 class="section-title">Which automatic metrics actually track human perception?</h2>
         <p class="section-lead">
-          The answer depends strongly on the perceptual target. No individual metric consistently explains all five human judgments.
+          The answer depends strongly on the perceptual target. No individual metric consistently explains all five human judgments, and Semantic Score (SC) shows no statistically meaningful association with any of the five subjective dimensions.
         </p>
 
         <div class="corr-grid">
           <div class="corr-card reveal">
             <h4>Human-likeness</h4>
-            <div class="corr-row"><div class="corr-head"><span>|LDLJ<sub>REL</sub>|</span><b>.615</b></div><div class="bar"><div class="fill" style="width:61.5%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>LDLJ<sub>REL</sub></span><b>−.61</b></div><div class="bar"><div class="fill" style="width:61%"></div></div></div>
             <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.55</b></div><div class="bar"><div class="fill" style="width:55%"></div></div></div>
           </div>
           <div class="corr-card reveal">
@@ -737,17 +736,17 @@
           </div>
           <div class="corr-card reveal">
             <h4>Absence of animation errors</h4>
-            <div class="corr-row"><div class="corr-head"><span>|LDLJ<sub>REL</sub>|</span><b>.623</b></div><div class="bar"><div class="fill" style="width:62.3%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>LDLJ<sub>REL</sub></span><b>−.62</b></div><div class="bar"><div class="fill" style="width:62%"></div></div></div>
             <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.54</b></div><div class="bar"><div class="fill" style="width:54%"></div></div></div>
           </div>
           <div class="corr-card reveal">
             <h4>Speech timing</h4>
-            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.727</b></div><div class="bar"><div class="fill" style="width:72.7%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.73</b></div><div class="bar"><div class="fill" style="width:73%"></div></div></div>
             <div class="corr-row"><div class="corr-head"><span>Density</span><b>.68</b></div><div class="bar"><div class="fill" style="width:68%"></div></div></div>
           </div>
           <div class="corr-card reveal">
             <h4>Content match</h4>
-            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.701</b></div><div class="bar"><div class="fill" style="width:70.1%"></div></div></div>
+            <div class="corr-row"><div class="corr-head"><span>Coverage</span><b>.70</b></div><div class="bar"><div class="fill" style="width:70%"></div></div></div>
             <div class="corr-row"><div class="corr-head"><span>Density</span><b>.66</b></div><div class="bar"><div class="fill" style="width:66%"></div></div></div>
           </div>
         </div>
@@ -756,15 +755,15 @@
           <div class="detail-card reveal">
             <h4>Muted judgments</h4>
             <p>
-              LDLJ<sub>REL</sub> is the strongest correlate for both human-likeness (ρ = −0.615) and absence of animation errors (ρ = −0.623).
+              LDLJ<sub>REL</sub> is the strongest correlate for both human-likeness (ρ = −0.61) and absence of animation errors (ρ = −0.62).
               Coverage and Density are most informative for motion diversity.
             </p>
           </div>
           <div class="detail-card reveal">
             <h4>Speech-aware judgments</h4>
             <p>
-              Coverage reaches ρ = 0.727 for speech timing and ρ = 0.701 for content match.
-              Density follows closely, while FGD also shows strong negative correlations with both audio targets.
+              Coverage reaches ρ = 0.73 for speech timing and ρ = 0.70 for content match.
+              Density and FGD show similarly strong associations with both speech-dependent targets.
             </p>
           </div>
           <div class="detail-card reveal">
@@ -782,7 +781,7 @@
           </div>
           <div class="finding reveal" data-n="B">
             <b>SGP is selectively speech-aware.</b>
-            <p>SGP correlates more strongly with speech timing (ρ = 0.419) and content match (ρ = 0.412) than with muted visual dimensions, supporting its intended role as a complementary semantic signal.</p>
+            <p>SGP shows the intended selectivity toward speech-aware judgments, correlating with both speech timing and content match at approximately ρ = 0.39 while remaining weak or non-significant for muted visual dimensions. SC, in contrast, shows no statistically meaningful correlation with any of the five subjective dimensions.</p>
           </div>
         </div>
       </div>
@@ -793,8 +792,8 @@
         <div class="section-kicker">08 · Composite metrics</div>
         <h2 class="section-title">Can combinations of metrics predict perception better than single metrics?</h2>
         <p class="section-lead">
-          For each perceptual target, a separate linear regressor combines 12 objective metrics.
-          Models are evaluated with leave-one-out cross-validation over the 60 generated model-sequence observations, with feature standardization performed inside each fold.
+          For each perceptual target, a separate ordinary least-squares regressor combines 13 objective predictors.
+          Chamfer Distance is excluded from the joint model because of its strong redundancy with Hausdorff Distance, while SC is retained as an independent semantics-aware predictor. Models are evaluated with leave-one-out cross-validation over the 60 generated model-sequence observations, with feature standardization performed inside each fold.
         </p>
 
         <div class="grid-3">
@@ -814,11 +813,26 @@
           <div class="detail-card reveal">
             <h4>Interpretation</h4>
             <p>
-              The broader conclusion is that complementary signals can improve perceptual prediction, especially for speech-aware dimensions,
-              but their utility remains target-dependent rather than universal.
+              All five composites improve over their strongest individual metric. The largest gains occur for absence of animation errors and content match, while the benefits for motion diversity and speech timing are smaller, showing that metric combination remains strongly target-dependent.
             </p>
           </div>
         </div>
+
+        <div class="table-wrap reveal" style="margin-top:24px">
+          <table style="min-width:860px">
+            <thead>
+              <tr><th>Target composite</th><th>MSE ↓</th><th>MAE ↓</th><th>Composite ρ ↑</th><th>Best individual</th><th>Δ|ρ| ↑</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>Human-likeness</b></td><td>0.2846</td><td>0.4140</td><td class="best">0.6568</td><td>LDLJ<sub>REL</sub></td><td>+0.0468</td></tr>
+              <tr><td><b>Motion diversity</b></td><td>0.2035</td><td>0.3610</td><td class="best">0.5375</td><td>Coverage</td><td>+0.0117</td></tr>
+              <tr><td><b>Absence of animation errors</b></td><td>0.1560</td><td>0.2984</td><td class="best">0.7065</td><td>LDLJ<sub>REL</sub></td><td>+0.0819</td></tr>
+              <tr><td><b>Speech timing</b></td><td>0.2671</td><td>0.4349</td><td class="best">0.7439</td><td>Coverage</td><td>+0.0246</td></tr>
+              <tr><td><b>Content match</b></td><td>0.3665</td><td>0.4844</td><td class="best">0.7824</td><td>Coverage</td><td>+0.0805</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Composite predictors are evaluated as dimension-specific automated proxies for human judgments, using out-of-fold predictions on the original seven-point rating scale rather than deriving an additional model-level ranking.</p>
       </div>
     </section>
 
